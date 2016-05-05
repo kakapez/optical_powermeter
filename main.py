@@ -3,6 +3,7 @@
 Created on Wed Aug 27 11:13:37 2014
 
 @author: nick
+@author: ChiHuan
 """
 
 from kivy.config import Config
@@ -25,7 +26,7 @@ import powermeter as pm
 import numpy as np
 
 
-class FloatInput(TextInput): 
+class FloatInput(TextInput):
 
     pat = re.compile('[^0-9]')
     multiline = False
@@ -54,15 +55,16 @@ class PowerMeterControl(TabbedPanel):
     plot = ObjectProperty(None)
 
     powermeter = None
-    
+
     pm_range = 4
-    
+
     iteration = 0
-    
+
     dt = 0.25
-    
+
 
     def update(self, dt):
+        #adding by ChiHuan in v1.0. Averaging the reading.
         v=[]
         average_v=0
         for i in range(0,50):
@@ -80,8 +82,8 @@ class PowerMeterControl(TabbedPanel):
             self.iteration = 0
             self.plot.points = []
             self.ids.graph1.remove_plot(self.plot)
-  
-       
+
+
 
     def update_range(self, value):
         self.pm_range = value
@@ -90,7 +92,7 @@ class PowerMeterControl(TabbedPanel):
             self.powermeter.set_range(int(self.pm_range))
             print self.pm_range
             return self.pm_range
-        
+
 
     def connect_to_powermeter(self, connection):
         if not self.connected:
@@ -105,34 +107,34 @@ class PowerMeterControl(TabbedPanel):
             self.ids.graph1.add_plot(plot)
             self.plot = plot
             return self.powermeter
- 
+
     def serial_ports_android(self):
         #Lists serial ports
         ports = glob.glob('/dev/ttyACM*')
         return ports
-    
-    
+
+
         """this section of the code deals with converting between the voltage value and the
     optical power at the wavelength of interest"""
-    
-    resistors = [1e6,110e3,10e3,1e3,20]    #sense resistors adjust to what is on the board
-    
-    file_name = 's5106_interpolated.cal'    #detector calibration file
-    
 
-    
+    resistors = [1e6,110e3,10e3,1e3,20]    #sense resistors adjust to what is on the board
+
+    file_name = 's5106_interpolated.cal'    #detector calibration file
+
+
+
     def _read_cal_file(self): # read in calibration file for sensor
         f = open(self.file_name,'r')
         x = json.load(f)
         f.close()
         return x
-        
+
 
     def volt2amp(self,voltage,range_number):
         self.amp = voltage/self.resistors[range_number]
         return self.amp
-								
-    
+
+
     def amp2power(self,voltage,wavelength,range_number):
         amp = self.volt2amp(voltage,range_number-1)
         xdata = self.data[0]
@@ -141,7 +143,7 @@ class PowerMeterControl(TabbedPanel):
         responsivity = ydata[i]
         power = amp/float(responsivity)
         return power
-    
+
     def formated_power(self):
         power = self.amp2power(self.voltage,self.wavelength,int(self.pm_range))
         fpower = power*1000
@@ -159,23 +161,23 @@ class PowerMeterControl(TabbedPanel):
         else:
             out = 'High'
         return out
-    
+
     def power_max(self):
         if self.max_power < self.power:
             self.max_power = self.power
         return self.max_power
-      
+
 class PowermeterApp(App):
     def build(self):
         self.control = PowerMeterControl()
         return self.control
-    
+
     def on_pause(self):
         return True
-        
+
     def on_resume(self):
         pass
-    
+
     def on_stop(self):
         self.control.powermeter.reset()
         self.control.powermeter.close_port()
@@ -184,7 +186,7 @@ class PowermeterApp(App):
         #usbotg = UsbDeviceConnection()
         #usbotg.close()
         print 'Port Closed'
-        return 
+        return
 
 
 
