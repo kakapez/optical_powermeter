@@ -1,0 +1,235 @@
+<PropertyLabel@Label>:
+    halign: 'left'
+    text_size: self.width, None
+    #color: [0,0,0,1]
+    font_size: 35
+
+<EchoLabel@PropertyLabel>:
+    halign: 'center'
+    text_size: self.width, None
+    #color: [0,0,0,1]
+    font_size: 35
+
+
+
+<PowerMeterControl>:
+
+    do_default_tab: False
+    background_color: [0,0,0,0]
+    TabbedPanelItem:
+        text: 'Setup'
+        Label:
+            
+
+
+      
+        
+            GridLayout:
+                id: connection_box
+                cols: 1
+                x: root.width / 8
+                width: root.width / 2
+                top: root.height - root.height/8
+                row_default_height: 70
+                row_force_default: True
+        
+                PropertyLabel:
+                    text: 'Serial port'
+                
+                Spinner:
+                    id: connection_input
+                    text: 'Select Serial Port'
+                    values: root.serial_ports_android()
+                    size_hint_y: None
+                    
+                
+                
+        
+                Button:
+                    text: 'connect' if not root.connected else 'disconnect'
+                    on_release: root.connect_to_powermeter(connection_input.text)
+        
+            GridLayout:
+                id: main_params
+                cols: 2
+                x: connection_box.x
+                width: connection_box.width
+                row_default_height: connection_box.row_default_height
+                top: connection_box.y - self.row_default_height*2
+                row_force_default: True
+        
+                PropertyLabel:
+                    text: 'Power'
+        
+                EchoLabel:
+                    text: str(root.fpower)
+        
+                PropertyLabel:
+                    text: 'Wavelength'
+        
+        
+                FloatInput:
+                    id: wavelength
+                    text: str(root.wavelength)
+                    #value:780            
+                    on_text_validate: root.wavelength = (float(self.text))
+                    font_size: 50
+                PropertyLabel:
+                    text: 'Select Range'
+                
+                Spinner:
+                    id: select_range_2
+                    #is_open: True
+                    #on_release: root.update_parameter(select_range.text) 
+                    text: str(root.pm_range)
+                    values:('1','2','3','4','5')
+                    size_hint_y: None
+                    _on_dropdown_select: root.update_range(select_range_2.text)
+        
+                PropertyLabel:
+                    text: 'Detector Voltage'
+        
+                EchoLabel:
+                    text: str(root.voltage) 
+                    
+            AnchorLayout:
+        
+                anchor_x: 'left'
+                anchor_y: 'bottom'
+        
+                x: root.x + 0.7*root.width
+                y: root.y + 0.5*root.height
+        
+                width: 0.3 * root.width
+                height: 0.3 * root.height        
+
+        
+
+                Image:
+                    source: root.logo
+                    size: [240,192]
+                    size_hint: None, None
+
+
+    TabbedPanelItem:
+        text: 'Power'
+        Label: 
+            GridLayout:
+                id: power_pannel
+                cols: 4
+                x: root.width / 8
+                width: root.width/1.2
+                top: root.height - root.height / 6
+                row_default_height: 50
+                row_force_default: True
+                spacing: [40,40]
+
+                PropertyLabel:
+                    text: 'Wavelength'
+        
+        
+                FloatInput:
+                    id: wavelength_2
+                    text: str(root.wavelength)
+                    #value:780            
+                    on_text_validate: root.wavelength = (float(self.text))
+                    font_size: 35
+        
+                PropertyLabel:
+                    text: 'Select Range'
+                
+                Spinner:
+                    id: select_range
+                    #is_open: True
+                    #on_release: root.update_parameter(select_range.text) 
+                    text: str(root.pm_range)
+                    values:('1','2','3','4','5')
+                    size_hint_y: None
+                    _on_dropdown_select: root.update_range(select_range.text)
+
+            AnchorLayout:
+        
+                anchor_x: 'left'
+                anchor_y: 'bottom'
+        
+                x: root.x #+ root.width
+                y: root.y + 0.15*root.height
+        
+                width: root.width
+                height: 0.7 * root.height        
+
+                EchoLabel:
+                    font_size: 250
+                    text: str(root.fpower)
+
+            GridLayout:
+                id: power_pannel
+                cols: 4
+                row: 2
+                x: root.width / 8
+                width: root.width/1.5 
+                top: 200
+                row_default_height: 60
+                row_force_default: True
+                
+                Button:
+                    text: '400 nm'
+                    on_release: root.wavelength = 400  
+                Button:
+                    text: '532 nm'
+                    on_release: root.wavelength = 532 
+                Button:
+                    text: '650 nm'
+                    on_release: root.wavelength = 650 
+                Button:
+                    text: '770 nm'
+                    on_release: root.wavelength = 770 
+                Button:
+                    text: '780 nm'
+                    on_release: root.wavelength = 780 
+                Button:
+                    text: '810 nm'
+                    on_release: root.wavelength = 810 
+                Button:
+                    text: '960 nm'
+                    on_release: root.wavelength = 960 
+                Button:
+                    text: '1064 nm'
+                    on_release: root.wavelength = 1064 
+ 
+
+    TabbedPanelItem:
+        text: 'Power plot'
+        Label: 
+
+            AnchorLayout:
+        
+                anchor_x: 'left'
+                anchor_y: 'bottom'
+        
+                x: root.x + 0.1*root.width
+                y: root.y + 0.1*root.height
+        
+                width: 0.8 * root.width
+                height: 0.8 * root.height
+        
+
+                Graph:
+                    id: graph1
+                    xlabel: 'Time (Sec)'
+                    ylabel: 'Power (mW)'
+                    ymin: 0
+                    ymax: 10
+                    xmin: 0
+                    xmax: 150
+                    y_grid: True
+                    y_ticks_major: 2
+                    y_grid_label: 'True'
+                    x_grid_label: 'True'
+                    #x_grid: 'True'
+                    x_ticks_major: 50
+                    label_options: dict(color=[1,1,1,1],bold='True')
+    TabbedPanelItem:
+        text: 'Power Log'
+        Label: 
+            text:'Coming in a future version'
